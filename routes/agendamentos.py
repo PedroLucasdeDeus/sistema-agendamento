@@ -17,7 +17,15 @@ def listar():
         .order_by(Horario.data, Horario.hora) # Ordena pelos campos data e hora, sujeito a mudanças posteriormente.
         .all()
     )
-    return render_template('agendamentos/lista.html', agendamentos=agendamentos)
+    # Dados do formulário de criação: clientes cadastrados e horários livres.
+    clientes = Cliente.query.order_by(Cliente.nome).all()
+    horarios_disponiveis = Horario.query.filter_by(disponivel=True).all()
+    return render_template(
+        'agendamentos/lista.html',
+        agendamentos=agendamentos,
+        clientes=clientes,
+        horarios_disponiveis=horarios_disponiveis,
+    )
 
 
 @agendamentos_bp.route('/', methods=['POST'])

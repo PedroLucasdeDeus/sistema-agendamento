@@ -3,6 +3,24 @@
 {% block content %}
 <h1>Agendamentos</h1>
 
+<form hx-post="/agendamentos" hx-target="#lista-agendamentos" hx-swap="afterbegin">
+    <label>Cliente
+        <select name="cliente_id" required>
+            {% for cliente in clientes %}
+            <option value="{{ cliente.id }}">{{ cliente.nome }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <label>Horário
+        <select name="horario_id" required>
+            {% for horario in horarios_disponiveis %}
+            <option value="{{ horario.id }}">{{ horario.data }} - {{ horario.hora }}</option>
+            {% endfor %}
+        </select>
+    </label>
+    <button type="submit">Agendar</button>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -12,7 +30,7 @@
             <th>Ações</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="lista-agendamentos">
         {% for agendamento in agendamentos %}
         {% include "agendamentos/_linha.html" %}
         {% else %}
