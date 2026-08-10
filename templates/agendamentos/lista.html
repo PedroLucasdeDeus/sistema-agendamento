@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Agendamentos</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Data</th>
+            <th>Hora</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for agendamento in agendamentos %}
+        <tr>
+            <td>{{ agendamento.cliente.nome }}</td>
+            <td>{{ agendamento.horario.data }}</td>
+            <td>{{ agendamento.horario.hora }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="3">Nenhum agendamento ativo encontrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
