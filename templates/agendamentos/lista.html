@@ -9,18 +9,15 @@
             <th>Cliente</th>
             <th>Data</th>
             <th>Hora</th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
         {% for agendamento in agendamentos %}
-        <tr>
-            <td>{{ agendamento.cliente.nome }}</td>
-            <td>{{ agendamento.horario.data }}</td>
-            <td>{{ agendamento.horario.hora }}</td>
-        </tr>
+        {% include "agendamentos/_linha.html" %}
         {% else %}
         <tr>
-            <td colspan="3">Nenhum agendamento ativo encontrado.</td>
+            <td colspan="4">Nenhum agendamento ativo encontrado.</td>
         </tr>
         {% endfor %}
     </tbody>
