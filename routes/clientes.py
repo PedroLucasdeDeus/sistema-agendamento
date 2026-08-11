@@ -31,7 +31,7 @@ def listar_clientes():
     }
 
 
-@clientes_bp.route("/novo", methods=["POST"])
+@clientes_bp.route("/", methods=["POST"])
 def criar_cliente():
 
     dados = request.get_json(silent=True)
