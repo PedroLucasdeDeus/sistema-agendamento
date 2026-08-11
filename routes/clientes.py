@@ -1,9 +1,4 @@
-from flask import (
-    Blueprint,
-    request,
-    redirect,
-    url_for
-)
+from flask import Blueprint, request
 
 from extensions import db
 from models import Cliente
@@ -16,9 +11,8 @@ clientes_bp = Blueprint(
 )
 
 
-# LISTAR CLIENTES
-@clientes_bp.route("/")
-def lista():
+@clientes_bp.route("/", methods=["GET"])
+def listar_clientes():
 
     clientes = Cliente.query.order_by(
         Cliente.nome
@@ -37,30 +31,34 @@ def lista():
     }
 
 
-# CADASTRAR CLIENTE
 @clientes_bp.route("/novo", methods=["POST"])
-def novo():
+def criar_cliente():
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
 
-    nome = dados.get("nome")
-    telefone = dados.get("telefone")
-    email = dados.get("email")
+    if not dados:
+        return {
+            "erro": "Os dados do cliente devem ser enviados em JSON."
+        }, 400
+
+    nome = dados.get("nome", "").strip()
+    telefone = dados.get("telefone", "").strip()
+    email = dados.get("email", "").strip()
 
     if not nome:
         return {
-            "erro": "O nome é obrigatório."
+            "erro": "O nome do cliente é obrigatório."
         }, 400
 
     if not telefone:
         return {
-            "erro": "O telefone é obrigatório."
+            "erro": "O telefone do cliente é obrigatório."
         }, 400
 
     cliente = Cliente(
         nome=nome,
         telefone=telefone,
-        email=email
+        email=email or None
     )
 
     db.session.add(cliente)
@@ -77,9 +75,8 @@ def novo():
     }, 201
 
 
-# BUSCAR UM CLIENTE
-@clientes_bp.route("/<int:id>")
-def buscar(id):
+@clientes_bp.route("/<int:id>", methods=["GET"])
+def buscar_cliente(id):
 
     cliente = db.get_or_404(Cliente, id)
 
@@ -91,26 +88,49 @@ def buscar(id):
     }
 
 
-# EDITAR CLIENTE
 @clientes_bp.route("/<int:id>", methods=["PUT"])
-def editar(id):
+def editar_cliente(id):
 
     cliente = db.get_or_404(Cliente, id)
 
-    dados = request.get_json()
+    dados = request.get_json(silent=True)
 
-    nome = dados.get("nome")
-    telefone = dados.get("telefone")
-    email = dados.get("email")
+    if not dados:
+        return {
+            "erro": "Nenhum dado foi enviado."
+        }, 400
 
-    if nome:
+    if "nome" in dados:
+
+        nome = dados["nome"].strip()
+
+        if not nome:
+            return {
+                "erro": "O nome não pode ficar vazio."
+            }, 400
+
         cliente.nome = nome
 
-    if telefone:
+    if "telefone" in dados:
+
+        telefone = dados["telefone"].strip()
+
+        if not telefone:
+            return {
+                "erro": "O telefone não pode ficar vazio."
+            }, 400
+
         cliente.telefone = telefone
 
-    if email is not None:
-        cliente.email = email
+    if "email" in dados:
+
+        email = dados["email"]
+
+        cliente.email = (
+            email.strip()
+            if email
+            else None
+        )
 
     db.session.commit()
 
@@ -125,9 +145,8 @@ def editar(id):
     }
 
 
-# EXCLUIR CLIENTE
 @clientes_bp.route("/<int:id>", methods=["DELETE"])
-def excluir(id):
+def excluir_cliente(id):
 
     cliente = db.get_or_404(Cliente, id)
 
