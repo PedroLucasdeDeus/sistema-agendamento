@@ -64,3 +64,21 @@ def criar():
     # Devolve apenas o fragmento da nova linha para o front
     # inserir na tabela sem recarregar a página.
     return render_template('agendamentos/_linha.html', agendamento=agendamento)
+
+
+@agendamentos_bp.route('/<int:id>/cancelar', methods=['PATCH'])
+def cancelar(id):
+    agendamento = db.session.get(Agendamento, id)
+    if not agendamento:
+        flash('Agendamento não encontrado.', 'error')
+        return redirect(url_for('agendamentos.listar'))
+
+    # Não apaga o registro (preserva histórico/auditoria) — só
+    # muda o status. A listagem filtra status='ativo', então ele some da tela.
+    agendamento.status = 'cancelado'
+    agendamento.horario.disponivel = True
+    db.session.commit()
+
+    # Corpo vazio + hx-swap="outerHTML" no <tr>
+    # faz o HTMX substituir a linha por nada, removendo-a do DOM.
+    return '', 200

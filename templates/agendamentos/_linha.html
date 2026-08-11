@@ -3,6 +3,12 @@
     <td>{{ agendamento.horario.data }}</td>
     <td>{{ agendamento.horario.hora }}</td>
     <td>
-        <button type="button">Cancelar</button>
+        <button
+            type="button"
+            hx-patch="{{ url_for('agendamentos.cancelar', id=agendamento.id) }}"
+            hx-target="closest tr"
+            hx-swap="outerHTML"
+            hx-confirm="Tem certeza que deseja cancelar?"
+        >Cancelar</button>
     </td>
 </tr>
