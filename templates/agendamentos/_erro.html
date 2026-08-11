@@ -1,0 +1,6 @@
+{# Fragmento de erro reutilizável via HTMX. É um <tr> de propósito: em
+   requisições HTMX ele é inserido no hx-target — no <tbody> da lista
+   (criação) ou no lugar da própria linha (cancelamento). #}
+<tr class="erro">
+    <td colspan="4">{{ mensagem }}</td>
+</tr>
