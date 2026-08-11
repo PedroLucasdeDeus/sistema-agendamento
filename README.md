@@ -1,9 +1,20 @@
-# Clínica - Sistema de Agendamento
+# Sistema de Agendamento - Clínica de Estética
 
-Sistema web para gerenciamento de clientes,
-horários disponíveis e agendamentos de uma clínica.
+## Objetivo
 
-## Tecnologias
+Sistema web desenvolvido para auxiliar no gerenciamento
+de uma clínica de estética fictícia.
+
+O sistema permite organizar clientes, horários disponíveis
+e agendamentos, reduzindo o risco de conflitos de horário
+e facilitando a visualização dos próximos atendimentos.
+
+O sistema é destinado ao uso interno da clínica, não sendo
+necessário que os clientes realizem seus próprios agendamentos.
+
+---
+
+## Tecnologias utilizadas
 
 - Python
 - Flask
@@ -11,22 +22,57 @@ horários disponíveis e agendamentos de uma clínica.
 - SQLite
 - HTML
 - CSS
-- Jinja2
+- Git e GitHub
 
-## Estrutura
+---
 
-O projeto utiliza Flask Blueprints para separar
-os módulos da aplicação.
+## Funcionalidades
 
-### Módulos
+### Clientes
 
-- Clientes
-- Horários
-- Agendamentos
+- Cadastro de clientes;
+- Listagem de clientes;
+- Consulta de cliente;
+- Edição de clientes;
+- Exclusão de clientes.
 
-## Executando o projeto
+### Horários
 
-Instale as dependências:
+- Cadastro de horários disponíveis;
+- Listagem de horários;
+- Controle de disponibilidade.
 
-```bash
-pip install -r requirements.txt
+### Agendamentos
+
+- Agendamento de um cliente em um horário disponível;
+- Cancelamento de agendamento;
+- Validação para impedir dois clientes no mesmo horário;
+- Listagem dos próximos agendamentos.
+
+---
+
+## Organização do projeto
+
+O projeto utiliza uma arquitetura modular baseada
+em Flask Blueprints.
+
+```text
+clinica-agendamento/
+│
+├── app.py
+├── config.py
+├── extensions.py
+├── database.py
+├── models.py
+│
+├── routes/
+│   ├── clientes.py
+│   ├── horarios.py
+│   └── agendamentos.py
+│
+├── templates/
+├── static/
+│
+├── requirements.txt
+├── README.md
+└── .gitignore
