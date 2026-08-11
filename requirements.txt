@@ -1,1 +1,5 @@
-r
+Flask
+Flask-SQLAlchemy
+
+depois no terminal:
+pip install -r requirements.txt
