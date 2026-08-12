@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}
+Clientes
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <h1>Clientes</h1>
+        <p>Clientes cadastrados na clínica.</p>
+    </div>
+
+    <a href="{{ url_for('clientes.pagina_novo_cliente') }}"
+       class="button">
+        + Cadastrar cliente
+    </a>
+</section>
+
+
+<div id="mensagem"></div>
+
+
+<section class="card">
+
+    <div id="carregando">
+        Carregando clientes...
+    </div>
+
+    <div id="lista-clientes"></div>
+
+</section>
+
+
+<script>
+
+async function carregarClientes() {
+
+    const lista = document.getElementById("lista-clientes");
+    const carregando = document.getElementById("carregando");
+
+    try {
+
+        const resposta = await fetch("/clientes/");
+
+        if (!resposta.ok) {
+            throw new Error("Erro ao carregar clientes.");
+        }
+
+        const dados = await resposta.json();
+
+        carregando.style.display = "none";
+
+        if (dados.clientes.length === 0) {
+
+            lista.innerHTML = `
+                <div class="empty-state">
+                    <h2>Nenhum cliente cadastrado</h2>
+                    <p>Cadastre o primeiro cliente da clínica.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+        lista.innerHTML = dados.clientes.map(cliente => `
+
+            <div class="client-item">
+
+                <div>
+                    <h2>${cliente.nome}</h2>
+
+                    <p>
+                        Telefone: ${cliente.telefone}
+                    </p>
+
+                    <p>
+                        ${cliente.email || "E-mail não informado"}
+                    </p>
+                </div>
+
+                <div class="client-actions">
+
+                    <a
+                        href="/clientes/${cliente.id}/visualizar"
+                        class="button secondary">
+                        Ver
+                    </a>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+    } catch (erro) {
+
+        carregando.style.display = "none";
+
+        lista.innerHTML = `
+            <div class="message error">
+                Não foi possível carregar os clientes.
+            </div>
+        `;
+
+        console.error(erro);
+    }
+}
+
+
+carregarClientes();
+
+</script>
+
+{% endblock %}

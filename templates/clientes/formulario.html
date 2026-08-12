@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if modo_edicao %}
+        Editar Cliente
+    {% else %}
+        Cadastrar Cliente
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+        <h1>
+            {% if modo_edicao %}
+                Editar cliente
+            {% else %}
+                Cadastrar cliente
+            {% endif %}
+        </h1>
+
+        <p>
+            {% if modo_edicao %}
+                Altere os dados do cliente.
+            {% else %}
+                Informe os dados do novo cliente.
+            {% endif %}
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('clientes.pagina_clientes') }}"
+        class="button secondary">
+        Voltar
+    </a>
+
+</section>
+
+
+<section
+    class="card"
+    id="form-container"
+    data-modo-edicao="{{ modo_edicao | default(false) | lower }}"
+    data-cliente-id="{{ cliente_id | default('') }}"
+>
+
+    <form id="form-cliente">
+
+        <div class="form-group">
+
+            <label for="nome">
+                Nome *
+            </label>
+
+            <input
+                type="text"
+                id="nome"
+                name="nome"
+                maxlength="100"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="telefone">
+                Telefone *
+            </label>
+
+            <input
+                type="text"
+                id="telefone"
+                name="telefone"
+                maxlength="20"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="email">
+                E-mail
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                maxlength="120"
+            >
+
+        </div>
+
+
+        <div id="mensagem"></div>
+
+
+        <button
+            type="submit"
+            class="button">
+
+            {% if modo_edicao %}
+                Salvar alterações
+            {% else %}
+                Cadastrar cliente
+            {% endif %}
+
+        </button>
+
+    </form>
+
+</section>
+
+
+<script>
+
+const container =
+    document.getElementById("form-container");
+
+const formulario =
+    document.getElementById("form-cliente");
+
+const mensagem =
+    document.getElementById("mensagem");
+
+
+const modoEdicao =
+    container.dataset.modoEdicao === "true";
+
+const clienteId =
+    container.dataset.clienteId || null;
+
+
+/*
+ * Carrega os dados do cliente
+ * quando o formulário está no modo de edição.
+ */
+async function carregarCliente() {
+
+    if (!modoEdicao) {
+        return;
+    }
+
+
+    try {
+
+        const resposta = await fetch(
+            `/clientes/${clienteId}`
+        );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Cliente não encontrado."
+            );
+
+        }
+
+
+        const cliente =
+            await resposta.json();
+
+
+        document.getElementById("nome").value =
+            cliente.nome || "";
+
+
+        document.getElementById("telefone").value =
+            cliente.telefone || "";
+
+
+        document.getElementById("email").value =
+            cliente.email || "";
+
+
+    } catch (erro) {
+
+        mensagem.innerHTML = `
+            <div class="message error">
+                Não foi possível carregar os dados do cliente.
+            </div>
+        `;
+
+
+        console.error(erro);
+
+    }
+
+}
+
+
+/*
+ * Envia o formulário.
+ */
+formulario.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const nome =
+            document.getElementById("nome")
+                .value
+                .trim();
+
+
+        const telefone =
+            document.getElementById("telefone")
+                .value
+                .trim();
+
+
+        const email =
+            document.getElementById("email")
+                .value
+                .trim();
+
+
+        /*
+         * Validação do nome.
+         */
+        if (!nome) {
+
+            mensagem.innerHTML = `
+                <div class="message error">
+                    O nome é obrigatório.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        /*
+         * Validação do telefone.
+         */
+        if (!telefone) {
+
+            mensagem.innerHTML = `
+                <div class="message error">
+                    O telefone é obrigatório.
+                </div>
+            `;
+
+            return;
+        }
+
+
+        try {
+
+            let resposta;
+
+
+            /*
+             * Edição do cliente.
+             */
+            if (modoEdicao) {
+
+                resposta = await fetch(
+                    `/clientes/${clienteId}`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            nome: nome,
+                            telefone: telefone,
+                            email: email || null
+                        })
+                    }
+                );
+
+
+            /*
+             * Cadastro de um novo cliente.
+             */
+            } else {
+
+                resposta = await fetch(
+                    "/clientes/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            nome: nome,
+                            telefone: telefone,
+                            email: email || null
+                        })
+                    }
+                );
+
+            }
+
+
+            const dados =
+                await resposta.json();
+
+
+            /*
+             * Se a API retornar erro.
+             */
+            if (!resposta.ok) {
+
+                mensagem.innerHTML = `
+                    <div class="message error">
+                        ${
+                            dados.erro ||
+                            "Não foi possível salvar o cliente."
+                        }
+                    </div>
+                `;
+
+                return;
+            }
+
+
+            /*
+             * Mensagem de sucesso.
+             */
+            mensagem.innerHTML = `
+                <div class="message success">
+                    ${
+                        modoEdicao
+                            ? "Cliente atualizado com sucesso!"
+                            : "Cliente cadastrado com sucesso!"
+                    }
+                </div>
+            `;
+
+
+            /*
+             * Depois de salvar, redireciona.
+             */
+            setTimeout(function() {
+
+                if (modoEdicao) {
+
+                    window.location.href =
+                        `/clientes/${clienteId}/visualizar`;
+
+                } else {
+
+                    window.location.href =
+                        "/clientes/pagina";
+
+                }
+
+            }, 1000);
+
+
+        } catch (erro) {
+
+            mensagem.innerHTML = `
+                <div class="message error">
+                    Erro ao conectar com o servidor.
+                </div>
+            `;
+
+
+            console.error(erro);
+
+        }
+
+    }
+);
+
+
+/*
+ * Verifica se é edição e,
+ * nesse caso, carrega os dados.
+ */
+carregarCliente();
+
+</script>
+
+{% endblock %}

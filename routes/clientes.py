@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, render_template
 
 from extensions import db
 from models import Cliente
@@ -10,6 +10,36 @@ clientes_bp = Blueprint(
     url_prefix="/clientes"
 )
 
+@clientes_bp.route("/pagina", methods=["GET"])
+def pagina_clientes():
+    return render_template("clientes/lista.html")
+
+
+@clientes_bp.route("/novo", methods=["GET"])
+def pagina_novo_cliente():
+    return render_template(
+        "clientes/formulario.html",
+        modo_edicao=False
+    )
+
+
+@clientes_bp.route("/<int:id>/visualizar", methods=["GET"])
+def pagina_detalhe_cliente(id):
+    return render_template(
+        "clientes/detalhe.html",
+        cliente_id=id
+    )
+    
+@clientes_bp.route("/<int:id>/editar", methods=["GET"])
+def pagina_editar_cliente(id):
+    return render_template(
+        "clientes/formulario.html",
+        cliente_id=id,
+        modo_edicao=True
+    )
+
+
+# A partir daqui continuam suas rotas do CRUD
 
 @clientes_bp.route("/", methods=["GET"])
 def listar_clientes():
