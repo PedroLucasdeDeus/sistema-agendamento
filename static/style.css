@@ -791,3 +791,260 @@ body {
     }
 
 }
+
+/* =========================================================
+   BUSCA DE CLIENTES
+   ========================================================= */
+
+.busca-container {
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.busca-container label {
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.busca-container input {
+
+    font-size:
+        15px;
+
+    padding:
+        14px 16px;
+
+}
+
+
+/* =========================================================
+   CONTADOR DE CLIENTES
+   ========================================================= */
+
+.contador-clientes {
+
+    color:
+        #9b8884;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+/* =========================================================
+   ITEM DO CLIENTE
+   ========================================================= */
+
+.client-item {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        25px;
+
+    padding:
+        22px;
+
+    margin-bottom:
+        15px;
+
+    background:
+        #faf5f3;
+
+    border:
+        1px solid #eee2de;
+
+    border-radius:
+        14px;
+
+    transition:
+        0.2s;
+
+}
+
+
+.client-item:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 5px 18px
+        rgba(90, 70, 65, 0.07);
+
+}
+
+
+/* =========================================================
+   INFORMAÇÕES DO CLIENTE
+   ========================================================= */
+
+.client-info {
+
+    min-width:
+        0;
+
+}
+
+
+.client-info h2 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        21px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.client-info p {
+
+    color:
+        #806e6a;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        5px;
+
+}
+
+
+.client-info p strong {
+
+    color:
+        #665654;
+
+}
+
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+
+.client-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-shrink:
+        0;
+
+}
+
+
+/* =========================================================
+   CLIENTE NÃO ENCONTRADO
+   ========================================================= */
+
+.empty-state {
+
+    text-align:
+        center;
+
+    padding:
+        50px 20px;
+
+}
+
+
+.empty-state h2 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        23px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.empty-state p {
+
+    color:
+        #9b8884;
+
+    font-size:
+        14px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE DA LISTA
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .client-item {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
+
+    }
+
+
+    .client-actions {
+
+        width:
+            100%;
+
+    }
+
+
+    .client-actions .button {
+
+        width:
+            100%;
+
+        text-align:
+            center;
+
+    }
+
+}

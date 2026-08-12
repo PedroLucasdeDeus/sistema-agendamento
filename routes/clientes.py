@@ -52,32 +52,108 @@ def pagina_editar_cliente(id):
 # ============================================================
 
 def cliente_para_dict(cliente):
-    """
-    Converte um objeto Cliente para um dicionário.
-    """
 
     return {
         "id": cliente.id,
         "nome": cliente.nome,
+        "cpf": cliente.cpf,
         "telefone": cliente.telefone,
         "email": cliente.email
     }
 
 
-def validar_dados_cliente(nome, telefone, email):
-    """
-    Valida os dados recebidos para cadastro ou edição.
-    Retorna uma mensagem de erro ou None quando os dados são válidos.
-    """
+def validar_cpf(cpf):
+
+    if not cpf:
+        return "O CPF do cliente é obrigatório."
+
+    # Remove pontuação
+    numeros = (
+        cpf
+        .replace(".", "")
+        .replace("-", "")
+        .replace(" ", "")
+    )
+
+    if len(numeros) != 11:
+        return "Informe um CPF válido."
+
+    if not numeros.isdigit():
+        return "O CPF deve possuir apenas números."
+
+    # Impede CPFs como 111.111.111-11
+    if numeros == numeros[0] * 11:
+        return "Informe um CPF válido."
+
+    # Primeiro dígito verificador
+    soma = 0
+
+    for i in range(9):
+        soma += int(numeros[i]) * (10 - i)
+
+    resto = soma % 11
+
+    if resto < 2:
+        digito1 = 0
+    else:
+        digito1 = 11 - resto
+
+    if digito1 != int(numeros[9]):
+        return "Informe um CPF válido."
+
+    # Segundo dígito verificador
+    soma = 0
+
+    for i in range(10):
+        soma += int(numeros[i]) * (11 - i)
+
+    resto = soma % 11
+
+    if resto < 2:
+        digito2 = 0
+    else:
+        digito2 = 11 - resto
+
+    if digito2 != int(numeros[10]):
+        return "Informe um CPF válido."
+
+    return None
+
+
+def validar_dados_cliente(
+    nome,
+    cpf,
+    telefone,
+    email
+):
 
     if not nome:
         return "O nome do cliente é obrigatório."
 
     if len(nome) < 2:
-        return "O nome do cliente deve possuir pelo menos 2 caracteres."
+        return (
+            "O nome do cliente deve possuir "
+            "pelo menos 2 caracteres."
+        )
 
     if len(nome) > 100:
-        return "O nome do cliente deve possuir no máximo 100 caracteres."
+        return (
+            "O nome do cliente deve possuir "
+            "no máximo 100 caracteres."
+        )
+
+    # --------------------------------------------------------
+    # CPF
+    # --------------------------------------------------------
+
+    erro_cpf = validar_cpf(cpf)
+
+    if erro_cpf:
+        return erro_cpf
+
+    # --------------------------------------------------------
+    # Telefone
+    # --------------------------------------------------------
 
     if not telefone:
         return "O telefone do cliente é obrigatório."
@@ -86,7 +162,14 @@ def validar_dados_cliente(nome, telefone, email):
         return "Informe um telefone válido."
 
     if len(telefone) > 20:
-        return "O telefone deve possuir no máximo 20 caracteres."
+        return (
+            "O telefone deve possuir "
+            "no máximo 20 caracteres."
+        )
+
+    # --------------------------------------------------------
+    # E-mail
+    # --------------------------------------------------------
 
     if email:
 
@@ -97,13 +180,16 @@ def validar_dados_cliente(nome, telefone, email):
             return "Informe um e-mail válido."
 
         if len(email) > 120:
-            return "O e-mail deve possuir no máximo 120 caracteres."
+            return (
+                "O e-mail deve possuir "
+                "no máximo 120 caracteres."
+            )
 
     return None
 
 
 # ============================================================
-# CRUD DE CLIENTES
+# LISTAR CLIENTES
 # ============================================================
 
 @clientes_bp.route("/", methods=["GET"])
@@ -121,6 +207,10 @@ def listar_clientes():
     }
 
 
+# ============================================================
+# CRIAR CLIENTE
+# ============================================================
+
 @clientes_bp.route("/", methods=["POST"])
 def criar_cliente():
 
@@ -128,11 +218,16 @@ def criar_cliente():
 
     if not dados:
         return {
-            "erro": "Os dados do cliente devem ser enviados em JSON."
+            "erro":
+                "Os dados do cliente devem ser enviados em JSON."
         }, 400
 
     nome = str(
         dados.get("nome", "")
+    ).strip()
+
+    cpf = str(
+        dados.get("cpf", "")
     ).strip()
 
     telefone = str(
@@ -143,13 +238,13 @@ def criar_cliente():
         dados.get("email", "")
     ).strip()
 
-
     # --------------------------------------------------------
     # Validação
     # --------------------------------------------------------
 
     erro = validar_dados_cliente(
         nome,
+        cpf,
         telefone,
         email
     )
@@ -159,6 +254,20 @@ def criar_cliente():
             "erro": erro
         }, 400
 
+    # --------------------------------------------------------
+    # Verifica CPF duplicado
+    # --------------------------------------------------------
+
+    cliente_existente = Cliente.query.filter_by(
+        cpf=cpf
+    ).first()
+
+    if cliente_existente:
+
+        return {
+            "erro":
+                "Já existe um cliente cadastrado com este CPF."
+        }, 400
 
     # --------------------------------------------------------
     # Criação
@@ -166,6 +275,7 @@ def criar_cliente():
 
     cliente = Cliente(
         nome=nome,
+        cpf=cpf,
         telefone=telefone,
         email=email or None
     )
@@ -181,15 +291,23 @@ def criar_cliente():
         db.session.rollback()
 
         return {
-            "erro": "Não foi possível cadastrar o cliente."
+            "erro":
+                "Não foi possível cadastrar o cliente."
         }, 500
 
-
     return {
-        "mensagem": "Cliente cadastrado com sucesso.",
-        "cliente": cliente_para_dict(cliente)
+        "mensagem":
+            "Cliente cadastrado com sucesso.",
+
+        "cliente":
+            cliente_para_dict(cliente)
+
     }, 201
 
+
+# ============================================================
+# BUSCAR CLIENTE
+# ============================================================
 
 @clientes_bp.route("/<int:id>", methods=["GET"])
 def buscar_cliente(id):
@@ -201,6 +319,10 @@ def buscar_cliente(id):
 
     return cliente_para_dict(cliente)
 
+
+# ============================================================
+# EDITAR CLIENTE
+# ============================================================
 
 @clientes_bp.route("/<int:id>", methods=["PUT"])
 def editar_cliente(id):
@@ -214,21 +336,21 @@ def editar_cliente(id):
 
     if not dados:
         return {
-            "erro": "Nenhum dado foi enviado."
+            "erro":
+                "Nenhum dado foi enviado."
         }, 400
 
-
     # --------------------------------------------------------
-    # Recupera os valores atuais
+    # Valores atuais
     # --------------------------------------------------------
 
     nome = cliente.nome
+    cpf = cliente.cpf
     telefone = cliente.telefone
     email = cliente.email
 
-
     # --------------------------------------------------------
-    # Atualiza apenas os campos enviados
+    # Atualiza somente o que foi enviado
     # --------------------------------------------------------
 
     if "nome" in dados:
@@ -237,6 +359,11 @@ def editar_cliente(id):
             dados["nome"]
         ).strip()
 
+    if "cpf" in dados:
+
+        cpf = str(
+            dados["cpf"]
+        ).strip()
 
     if "telefone" in dados:
 
@@ -244,13 +371,11 @@ def editar_cliente(id):
             dados["telefone"]
         ).strip()
 
-
     if "email" in dados:
 
         email = str(
             dados["email"]
         ).strip()
-
 
     # --------------------------------------------------------
     # Validação
@@ -258,6 +383,7 @@ def editar_cliente(id):
 
     erro = validar_dados_cliente(
         nome,
+        cpf,
         telefone,
         email
     )
@@ -267,15 +393,33 @@ def editar_cliente(id):
             "erro": erro
         }, 400
 
+    # --------------------------------------------------------
+    # Verifica CPF duplicado
+    #
+    # Aqui excluímos o próprio cliente da busca.
+    # --------------------------------------------------------
+
+    cliente_existente = Cliente.query.filter(
+        Cliente.cpf == cpf,
+        Cliente.id != id
+    ).first()
+
+    if cliente_existente:
+
+        return {
+            "erro":
+                "Já existe outro cliente cadastrado "
+                "com este CPF."
+        }, 400
 
     # --------------------------------------------------------
     # Atualização
     # --------------------------------------------------------
 
     cliente.nome = nome
+    cliente.cpf = cpf
     cliente.telefone = telefone
     cliente.email = email or None
-
 
     try:
 
@@ -286,15 +430,22 @@ def editar_cliente(id):
         db.session.rollback()
 
         return {
-            "erro": "Não foi possível atualizar o cliente."
+            "erro":
+                "Não foi possível atualizar o cliente."
         }, 500
 
-
     return {
-        "mensagem": "Cliente atualizado com sucesso.",
-        "cliente": cliente_para_dict(cliente)
+        "mensagem":
+            "Cliente atualizado com sucesso.",
+
+        "cliente":
+            cliente_para_dict(cliente)
     }
 
+
+# ============================================================
+# EXCLUIR CLIENTE
+# ============================================================
 
 @clientes_bp.route("/<int:id>", methods=["DELETE"])
 def excluir_cliente(id):
@@ -315,10 +466,11 @@ def excluir_cliente(id):
         db.session.rollback()
 
         return {
-            "erro": "Não foi possível excluir o cliente."
+            "erro":
+                "Não foi possível excluir o cliente."
         }, 500
 
-
     return {
-        "mensagem": "Cliente excluído com sucesso."
+        "mensagem":
+            "Cliente excluído com sucesso."
     }

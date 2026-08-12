@@ -147,11 +147,77 @@ async function carregarCliente() {
 
         clienteDiv.innerHTML = `
 
-            <div class="message error">
-                Não foi possível encontrar este cliente.
-            </div>
+    <div class="client-detail">
 
-        `;
+        <div class="detail-item">
+
+            <strong>Nome</strong>
+
+            <span>
+                ${cliente.nome || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>CPF</strong>
+
+            <span>
+                ${cliente.cpf || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Telefone</strong>
+
+            <span>
+                ${cliente.telefone || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>E-mail</strong>
+
+            <span>
+                ${cliente.email || "Não informado"}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="detail-actions">
+
+        <a
+            href="/clientes/${clienteId}/editar"
+            class="button">
+
+            Editar cliente
+
+        </a>
+
+
+        <button
+            type="button"
+            class="button danger"
+            onclick="excluirCliente()">
+
+            Excluir cliente
+
+        </button>
+
+    </div>
+
+`;
 
 
         console.error(erro);
