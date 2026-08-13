@@ -1,18 +1,50 @@
-from flask import Flask
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy() # Temporário, remover posteriormente
+from extensions import db
+
 
 class Agendamento(db.Model):
-    __tablename__ = 'agendamentos'
 
-    id = db.Column(db.Integer, primary_key=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
-    # Unique garante no bd que um horario só tenha um agendamento.
-    horario_id = db.Column(db.Integer, db.ForeignKey('horarios.id'), nullable=False, unique=True)
-    status = db.Column(db.String(20), nullable=False, default='ativo')
-    criado_em = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    __tablename__ = "agendamentos"
 
-    cliente = db.relationship('Cliente', backref=db.backref('agendamentos', lazy=True))
-    horario = db.relationship('Horario', backref=db.backref('agendamentos', lazy=True))
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    cliente_id = db.Column(
+        db.Integer,
+        db.ForeignKey("clientes.id"),
+        nullable=False
+    )
+
+    # UNIQUE garante no banco que um horário só tenha um agendamento —
+    # é a 2ª camada de defesa contra reservas duplicadas.
+    horario_id = db.Column(
+        db.Integer,
+        db.ForeignKey("horarios.id"),
+        nullable=False,
+        unique=True
+    )
+
+    status = db.Column(
+        db.String(20),
+        nullable=False,
+        default="ativo"  # 'ativo' | 'cancelado' (soft delete)
+    )
+
+    criado_em = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+
+    cliente = db.relationship(
+        "Cliente",
+        backref=db.backref("agendamentos", lazy=True)
+    )
+
+    horario = db.relationship(
+        "Horario",
+        backref=db.backref("agendamentos", lazy=True)
+    )
