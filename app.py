@@ -1,10 +1,12 @@
-from flask import Flask, render_template
+from flask import Flask, app, render_template
 
 from config import Config
 from extensions import db
 from database import init_db
 
 from routes.clientes import clientes_bp
+#from routes.horarios import horarios_bp
+#from routes.agendamento import agendamentos_bp
 
 
 def create_app():
@@ -16,6 +18,8 @@ def create_app():
     db.init_app(app)
 
     app.register_blueprint(clientes_bp)
+    #app.register_blueprint(horarios_bp)
+    #app.register_blueprint(agendamentos_bp)
 
     init_db(app)
 

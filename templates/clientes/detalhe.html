@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Detalhes do Cliente
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+        <h1>Detalhes do cliente</h1>
+
+        <p>
+            Visualize as informações cadastradas.
+        </p>
+    </div>
+
+    <a
+        href="{{ url_for('clientes.pagina_clientes') }}"
+        class="button secondary">
+        Voltar
+    </a>
+
+</section>
+
+
+<section
+    class="card"
+    id="cliente-container"
+    data-cliente-id="{{ cliente_id }}"
+>
+
+    <div id="carregando">
+        Carregando informações...
+    </div>
+
+    <div id="cliente"></div>
+
+</section>
+
+
+<script>
+
+const container =
+    document.getElementById("cliente-container");
+
+const clienteId =
+    container.dataset.clienteId;
+
+
+async function carregarCliente() {
+
+    const clienteDiv =
+        document.getElementById("cliente");
+
+    const carregando =
+        document.getElementById("carregando");
+
+
+    try {
+
+        const resposta = await fetch(
+            `/clientes/${clienteId}`
+        );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Cliente não encontrado."
+            );
+
+        }
+
+
+        const cliente = await resposta.json();
+
+
+        carregando.style.display = "none";
+
+
+        clienteDiv.innerHTML = `
+
+            <div class="client-detail">
+
+                <div class="detail-item">
+
+                    <strong>Nome</strong>
+
+                    <span>
+                        ${cliente.nome || "Não informado"}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <strong>Telefone</strong>
+
+                    <span>
+                        ${cliente.telefone || "Não informado"}
+                    </span>
+
+                </div>
+
+
+                <div class="detail-item">
+
+                    <strong>E-mail</strong>
+
+                    <span>
+                        ${cliente.email || "Não informado"}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="detail-actions">
+
+                <a
+                    href="/clientes/${clienteId}/editar"
+                    class="button">
+                    Editar cliente
+                </a>
+
+
+                <button
+                    type="button"
+                    class="button danger"
+                    onclick="excluirCliente()">
+                    Excluir cliente
+                </button>
+
+            </div>
+
+        `;
+
+
+    } catch (erro) {
+
+        carregando.style.display = "none";
+
+
+        clienteDiv.innerHTML = `
+
+    <div class="client-detail">
+
+        <div class="detail-item">
+
+            <strong>Nome</strong>
+
+            <span>
+                ${cliente.nome || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>CPF</strong>
+
+            <span>
+                ${cliente.cpf || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>Telefone</strong>
+
+            <span>
+                ${cliente.telefone || "Não informado"}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <strong>E-mail</strong>
+
+            <span>
+                ${cliente.email || "Não informado"}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="detail-actions">
+
+        <a
+            href="/clientes/${clienteId}/editar"
+            class="button">
+
+            Editar cliente
+
+        </a>
+
+
+        <button
+            type="button"
+            class="button danger"
+            onclick="excluirCliente()">
+
+            Excluir cliente
+
+        </button>
+
+    </div>
+
+`;
+
+
+        console.error(erro);
+
+    }
+
+}
+
+
+async function excluirCliente() {
+
+    const confirmar = confirm(
+        "Tem certeza que deseja excluir este cliente?"
+    );
+
+
+    if (!confirmar) {
+        return;
+    }
+
+
+    try {
+
+        const resposta = await fetch(
+            `/clientes/${clienteId}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        const dados = await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            alert(
+                dados.erro ||
+                "Não foi possível excluir o cliente."
+            );
+
+            return;
+        }
+
+
+        alert(
+            "Cliente excluído com sucesso!"
+        );
+
+
+        window.location.href =
+            "/clientes/pagina";
+
+
+    } catch (erro) {
+
+        alert(
+            "Erro ao conectar com o servidor."
+        );
+
+        console.error(erro);
+
+    }
+
+}
+
+
+carregarCliente();
+
+</script>
+
+{% endblock %}
