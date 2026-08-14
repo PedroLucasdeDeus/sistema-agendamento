@@ -1,0 +1,431 @@
+{% extends "base.html" %}
+
+{% block title %}
+Clientes
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+
+        <h1>
+            Clientes
+        </h1>
+
+        <p>
+            Clientes cadastrados na clínica.
+        </p>
+
+    </div>
+
+
+    <a
+        href="{{ url_for('clientes.pagina_novo_cliente') }}"
+        class="button">
+
+        + Cadastrar cliente
+
+    </a>
+
+</section>
+
+
+<div id="mensagem"></div>
+
+
+<section class="card">
+
+    <!-- =====================================================
+         BUSCA
+    ====================================================== -->
+
+    <div class="form-group busca-container">
+
+        <label for="busca">
+            Buscar cliente
+        </label>
+
+        <input
+            type="text"
+            id="busca"
+            placeholder="Digite o nome ou CPF..."
+            autocomplete="off"
+        >
+
+    </div>
+
+
+    <!-- =====================================================
+         CONTADOR
+    ====================================================== -->
+
+    <div
+        id="contador-clientes"
+        class="contador-clientes">
+    </div>
+
+
+    <!-- =====================================================
+         CARREGANDO
+    ====================================================== -->
+
+    <div id="carregando">
+
+        Carregando clientes...
+
+    </div>
+
+
+    <!-- =====================================================
+         LISTA
+    ====================================================== -->
+
+    <div id="lista-clientes"></div>
+
+
+</section>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const lista =
+    document.getElementById(
+        "lista-clientes"
+    );
+
+const carregando =
+    document.getElementById(
+        "carregando"
+    );
+
+const busca =
+    document.getElementById(
+        "busca"
+    );
+
+const contador =
+    document.getElementById(
+        "contador-clientes"
+    );
+
+
+/*
+ * Guarda todos os clientes recebidos
+ * da API.
+ */
+
+let clientes = [];
+
+
+/* =========================================================
+   CARREGAR CLIENTES
+========================================================= */
+
+async function carregarClientes() {
+
+    try {
+
+        const resposta =
+            await fetch(
+                "/clientes/"
+            );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro ao carregar clientes."
+            );
+
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        clientes =
+            dados.clientes || [];
+
+
+        carregando.style.display =
+            "none";
+
+
+        /*
+         * Mostra a lista inicialmente.
+         */
+
+        mostrarClientes(
+            clientes
+        );
+
+
+    } catch (erro) {
+
+        carregando.style.display =
+            "none";
+
+
+        lista.innerHTML = `
+
+            <div class="message error">
+
+                Não foi possível carregar
+                os clientes.
+
+            </div>
+
+        `;
+
+
+        console.error(
+            erro
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MOSTRAR CLIENTES
+========================================================= */
+
+function mostrarClientes(
+    clientesParaMostrar
+) {
+
+    /*
+     * Atualiza o contador.
+     */
+
+    contador.textContent =
+        `${clientesParaMostrar.length} ${
+            clientesParaMostrar.length === 1
+                ? "cliente encontrado"
+                : "clientes encontrados"
+        }`;
+
+
+    /*
+     * Nenhum cliente encontrado.
+     */
+
+    if (
+        clientesParaMostrar.length === 0
+    ) {
+
+        lista.innerHTML = `
+
+            <div class="empty-state">
+
+                <h2>
+                    Nenhum cliente encontrado
+                </h2>
+
+                <p>
+                    Tente buscar por outro nome
+                    ou CPF.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    /*
+     * Cria os cards dos clientes.
+     */
+
+    lista.innerHTML =
+        clientesParaMostrar
+            .map(
+                cliente => `
+
+                <div class="client-item">
+
+                    <div class="client-info">
+
+                        <h2>
+                            ${cliente.nome}
+                        </h2>
+
+
+                        <p>
+                            <strong>CPF:</strong>
+                            ${
+                                cliente.cpf ||
+                                "Não informado"
+                            }
+                        </p>
+
+
+                        <p>
+                            <strong>Telefone:</strong>
+                            ${
+                                cliente.telefone ||
+                                "Não informado"
+                            }
+                        </p>
+
+
+                        <p>
+                            <strong>E-mail:</strong>
+                            ${
+                                cliente.email ||
+                                "Não informado"
+                            }
+                        </p>
+
+                    </div>
+
+
+                    <div class="client-actions">
+
+                        <a
+                            href="/clientes/${cliente.id}/visualizar"
+                            class="button secondary">
+
+                            Ver
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            `
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   BUSCAR POR NOME OU CPF
+========================================================= */
+
+busca.addEventListener(
+    "input",
+    function() {
+
+        /*
+         * Pega o que foi digitado.
+         */
+
+        const termo =
+            this.value
+                .trim()
+                .toLowerCase();
+
+
+        /*
+         * Remove pontuação do CPF
+         * para permitir buscas como:
+         *
+         * 12345678909
+         *
+         * ou:
+         *
+         * 123.456.789-09
+         */
+
+        const termoNumerico =
+            termo.replace(
+                /\D/g,
+                ""
+            );
+
+
+        /*
+         * Filtra os clientes.
+         */
+
+        const resultados =
+            clientes.filter(
+                cliente => {
+
+                    const nome =
+                        (
+                            cliente.nome ||
+                            ""
+                        )
+                        .toLowerCase();
+
+
+                    const cpf =
+                        (
+                            cliente.cpf ||
+                            ""
+                        );
+
+
+                    const cpfNumeros =
+                        cpf.replace(
+                            /\D/g,
+                            ""
+                        );
+
+
+                    /*
+                     * Busca pelo nome.
+                     */
+
+                    const encontrouNome =
+                        nome.includes(
+                            termo
+                        );
+
+
+                    /*
+                     * Busca pelo CPF.
+                     */
+
+                    const encontrouCpf =
+                        termoNumerico &&
+                        cpfNumeros.includes(
+                            termoNumerico
+                        );
+
+
+                    return (
+                        encontrouNome ||
+                        encontrouCpf
+                    );
+
+                }
+            );
+
+
+        /*
+         * Atualiza a tela.
+         */
+
+        mostrarClientes(
+            resultados
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+carregarClientes();
+
+</script>
+
+{% endblock %}

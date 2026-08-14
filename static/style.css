@@ -1,83 +1,1050 @@
+/* =========================================================
+   CONFIGURAÇÕES GERAIS
+   ========================================================= */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f5f2;
-    color: #333;
-    line-height: 1.6;
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    /*
+     * Imagem de fundo geral do sistema.
+     *
+     * Coloque a imagem em:
+     * static/imagens/fundo.jpeg
+     */
+    background-image:
+        linear-gradient(
+            rgba(250, 247, 245, 0.88),
+            rgba(250, 247, 245, 0.88)
+        ),
+        url("/static/imagens/fundo.jpeg");
+
+    background-size:
+        cover;
+
+    background-position:
+        center;
+
+    background-attachment:
+        fixed;
+
+    background-repeat:
+        no-repeat;
+
+    color:
+        #4a4140;
+
+    min-height:
+        100vh;
 }
 
-.container {
-    width: 90%;
-    max-width: 1100px;
-    margin: 0 auto;
+
+/* =========================================================
+   CABEÇALHO
+   ========================================================= */
+
+.topbar {
+
+    width:
+        100%;
+
+    background:
+        #ffffff;
+
+    border-bottom:
+        1px solid #eadfdb;
+
+    padding:
+        18px 7%;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    box-shadow:
+        0 2px 12px rgba(90, 70, 65, 0.05);
 }
 
-.header {
-    background-color: #ffffff;
-    border-bottom: 1px solid #e5e5e5;
-    padding: 20px 0;
+
+.brand {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
 }
 
-.header .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+.brand-icon {
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    border-radius:
+        50%;
+
+    background:
+        #ead0d0;
+
+    color:
+        #8c6262;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        22px;
 }
 
-.logo {
-    color: #333;
-    text-decoration: none;
-    font-size: 1.3rem;
-    font-weight: bold;
+
+.brand h1 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        22px;
+
+    color:
+        #765555;
+
+    font-weight:
+        500;
 }
 
-.nav {
-    display: flex;
-    gap: 20px;
+
+.brand span {
+
+    font-size:
+        12px;
+
+    color:
+        #9b8884;
+
+    letter-spacing:
+        0.5px;
 }
 
-.nav a {
-    color: #555;
-    text-decoration: none;
+
+/* =========================================================
+   NAVEGAÇÃO
+   ========================================================= */
+
+.navigation {
+
+    display:
+        flex;
+
+    gap:
+        28px;
 }
 
-.nav a:hover {
-    color: #000;
+
+.navigation a {
+
+    text-decoration:
+        none;
+
+    color:
+        #6e5c59;
+
+    font-size:
+        14px;
+
+    transition:
+        0.2s;
 }
 
-main.container {
-    min-height: 70vh;
-    padding-top: 40px;
-    padding-bottom: 40px;
+
+.navigation a:hover {
+
+    color:
+        #a66d6d;
 }
 
-.footer {
-    background-color: #ffffff;
-    border-top: 1px solid #e5e5e5;
-    padding: 20px 0;
-    text-align: center;
-    color: #777;
+
+/* =========================================================
+   CONTEÚDO
+   ========================================================= */
+
+.main-content {
+
+    width:
+        86%;
+
+    max-width:
+        1100px;
+
+    margin:
+        45px auto;
+
+    min-height:
+        calc(100vh - 170px);
 }
 
-.messages {
-    margin-bottom: 20px;
+
+/* =========================================================
+   CABEÇALHO DAS PÁGINAS
+   ========================================================= */
+
+.page-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    margin-bottom:
+        30px;
 }
+
+
+.page-header h1 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        32px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        6px;
+}
+
+
+.page-header p {
+
+    color:
+        #9b8884;
+
+    font-size:
+        14px;
+}
+
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.card {
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border:
+        1px solid #eee3df;
+
+    border-radius:
+        16px;
+
+    padding:
+        30px;
+
+    box-shadow:
+        0 8px 25px rgba(90, 70, 65, 0.06);
+}
+
+
+/* =========================================================
+   BOTÕES
+   ========================================================= */
+
+.button {
+
+    display:
+        inline-block;
+
+    border:
+        none;
+
+    border-radius:
+        9px;
+
+    padding:
+        11px 20px;
+
+    background:
+        #a66d6d;
+
+    color:
+        white;
+
+    text-decoration:
+        none;
+
+    font-size:
+        14px;
+
+    cursor:
+        pointer;
+
+    transition:
+        0.2s;
+}
+
+
+.button:hover {
+
+    background:
+        #8f5959;
+
+    transform:
+        translateY(-1px);
+}
+
+
+.button.secondary {
+
+    background:
+        #f1e7e4;
+
+    color:
+        #765555;
+}
+
+
+.button.secondary:hover {
+
+    background:
+        #e7d9d5;
+}
+
+
+.button.danger {
+
+    background:
+        #b66d6d;
+
+    margin-left:
+        10px;
+}
+
+
+.button.danger:hover {
+
+    background:
+        #9e5555;
+}
+
+
+/* =========================================================
+   FORMULÁRIOS
+   ========================================================= */
+
+.form-group {
+
+    margin-bottom:
+        22px;
+}
+
+
+.form-group label {
+
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    font-size:
+        14px;
+
+    font-weight:
+        600;
+
+    color:
+        #665654;
+}
+
+
+.form-group input {
+
+    width:
+        100%;
+
+    padding:
+        12px 14px;
+
+    border:
+        1px solid #ded2ce;
+
+    border-radius:
+        9px;
+
+    font-size:
+        14px;
+
+    color:
+        #4a4140;
+
+    background:
+        #fffdfc;
+
+    outline:
+        none;
+
+    transition:
+        0.2s;
+}
+
+
+.form-group input:focus {
+
+    border-color:
+        #b98989;
+
+    box-shadow:
+        0 0 0 3px rgba(185, 137, 137, 0.12);
+}
+
+
+/* =========================================================
+   MENSAGENS
+   ========================================================= */
 
 .message {
-    padding: 12px 16px;
-    border-radius: 5px;
-    margin-bottom: 10px;
+
+    padding:
+        12px 15px;
+
+    border-radius:
+        8px;
+
+    margin-bottom:
+        18px;
+
+    font-size:
+        14px;
 }
+
 
 .message.success {
-    background-color: #e8f5e9;
+
+    background:
+        #edf5ee;
+
+    color:
+        #527258;
+
+    border:
+        1px solid #d6e7d8;
 }
 
+
 .message.error {
-    background-color: #ffebee;
+
+    background:
+        #faeeee;
+
+    color:
+        #8a5050;
+
+    border:
+        1px solid #efd5d5;
+}
+
+
+/* =========================================================
+   DETALHES DO CLIENTE
+   ========================================================= */
+
+.client-detail {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap:
+        18px;
+
+    margin-bottom:
+        30px;
+}
+
+
+.detail-item {
+
+    background:
+        #faf5f3;
+
+    border:
+        1px solid #eee2de;
+
+    border-radius:
+        12px;
+
+    padding:
+        20px;
+}
+
+
+.detail-item strong {
+
+    display:
+        block;
+
+    font-size:
+        12px;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.5px;
+
+    color:
+        #9a817d;
+
+    margin-bottom:
+        8px;
+}
+
+
+.detail-item span {
+
+    font-size:
+        16px;
+
+    color:
+        #554846;
+}
+
+
+.detail-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+}
+
+
+/* =========================================================
+   RODAPÉ
+   ========================================================= */
+
+.footer {
+
+    text-align:
+        center;
+
+    padding:
+        25px;
+
+    color:
+        #a18f8b;
+
+    font-size:
+        12px;
+
+    border-top:
+        1px solid #eadfdb;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+}
+
+
+/* =========================================================
+   PÁGINA INICIAL
+   ========================================================= */
+
+/*
+ * Aqui a imagem fica mais visível do que nas outras páginas.
+ *
+ * No body usamos 0.88.
+ * Na home usamos 0.35.
+ *
+ * Quanto menor o último número,
+ * mais forte fica a imagem.
+ */
+
+.home {
+
+    min-height:
+        calc(100vh - 250px);
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    text-align:
+        center;
+
+    border-radius:
+        20px;
+
+    padding:
+        60px 30px;
+
+    background-image:
+        linear-gradient(
+            rgba(250, 247, 245, 0.35),
+            rgba(250, 247, 245, 0.35)
+        ),
+        url("/static/imagens/fundo.jpeg");
+
+    background-size:
+        cover;
+
+    background-position:
+        center;
+
+    box-shadow:
+        0 10px 30px rgba(90, 70, 65, 0.10);
+}
+
+
+.home h1 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        42px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        15px;
+}
+
+
+.home p {
+
+    color:
+        #665654;
+
+    font-size:
+        16px;
+
+    line-height:
+        1.7;
+
+    max-width:
+        600px;
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .topbar {
+
+        padding:
+            15px 5%;
+    }
+
+
+    .navigation {
+
+        display:
+            none;
+    }
+
+
+    .main-content {
+
+        width:
+            92%;
+
+        margin:
+            30px auto;
+    }
+
+
+    .page-header {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            18px;
+    }
+
+
+    .page-header h1 {
+
+        font-size:
+            27px;
+    }
+
+
+    .card {
+
+        padding:
+            20px;
+    }
+
+
+    .client-detail {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .detail-actions {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+        gap:
+            10px;
+    }
+
+
+    .button.danger {
+
+        margin-left:
+            0;
+    }
+
+
+    /* Página inicial no celular */
+
+    .home {
+
+        min-height:
+            500px;
+
+        padding:
+            40px 25px;
+    }
+
+
+    .home h1 {
+
+        font-size:
+            34px;
+    }
+
+
+    .home p {
+
+        font-size:
+            15px;
+    }
+
+}
+
+/* =========================================================
+   BUSCA DE CLIENTES
+   ========================================================= */
+
+.busca-container {
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.busca-container label {
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.busca-container input {
+
+    font-size:
+        15px;
+
+    padding:
+        14px 16px;
+
+}
+
+
+/* =========================================================
+   CONTADOR DE CLIENTES
+   ========================================================= */
+
+.contador-clientes {
+
+    color:
+        #9b8884;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+/* =========================================================
+   ITEM DO CLIENTE
+   ========================================================= */
+
+.client-item {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        25px;
+
+    padding:
+        22px;
+
+    margin-bottom:
+        15px;
+
+    background:
+        #faf5f3;
+
+    border:
+        1px solid #eee2de;
+
+    border-radius:
+        14px;
+
+    transition:
+        0.2s;
+
+}
+
+
+.client-item:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 5px 18px
+        rgba(90, 70, 65, 0.07);
+
+}
+
+
+/* =========================================================
+   INFORMAÇÕES DO CLIENTE
+   ========================================================= */
+
+.client-info {
+
+    min-width:
+        0;
+
+}
+
+
+.client-info h2 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        21px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.client-info p {
+
+    color:
+        #806e6a;
+
+    font-size:
+        13px;
+
+    margin-bottom:
+        5px;
+
+}
+
+
+.client-info p strong {
+
+    color:
+        #665654;
+
+}
+
+
+/* =========================================================
+   AÇÕES
+   ========================================================= */
+
+.client-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-shrink:
+        0;
+
+}
+
+
+/* =========================================================
+   CLIENTE NÃO ENCONTRADO
+   ========================================================= */
+
+.empty-state {
+
+    text-align:
+        center;
+
+    padding:
+        50px 20px;
+
+}
+
+
+.empty-state h2 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        23px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        10px;
+
+}
+
+
+.empty-state p {
+
+    color:
+        #9b8884;
+
+    font-size:
+        14px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVIDADE DA LISTA
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .client-item {
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
+
+    }
+
+
+    .client-actions {
+
+        width:
+            100%;
+
+    }
+
+
+    .client-actions .button {
+
+        width:
+            100%;
+
+        text-align:
+            center;
+
+    }
+
 }
