@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, render_template, request
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from extensions import db
@@ -12,6 +12,17 @@ agendamentos_bp = Blueprint(
 )
 
 
+# ============================================================
+# PÁGINA HTML
+# ============================================================
+
+@agendamentos_bp.route("/pagina", methods=["GET"])
+def pagina_agendamentos():
+    return render_template(
+        "agendamentos/lista.html"
+    )
+
+
 def _serializar(agendamento):
     """Converte um Agendamento em dict para facilitar o uso com json."""
     return {
@@ -23,8 +34,8 @@ def _serializar(agendamento):
         },
         "horario": {
             "id": agendamento.horario.id,
-            "data": agendamento.horario.data,
-            "hora": agendamento.horario.hora
+            "data": agendamento.horario.data.isoformat(),
+            "hora": agendamento.horario.hora.isoformat()
         }
     }
 
