@@ -21,8 +21,6 @@ def create_app():
     app.register_blueprint(horarios_bp)
     app.register_blueprint(agendamentos_bp)
 
-    app.register_blueprint(horarios_bp)
-
     init_db(app)
 
     @app.route("/")

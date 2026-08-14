@@ -23,8 +23,8 @@ def _serializar(agendamento):
         },
         "horario": {
             "id": agendamento.horario.id,
-            "data": agendamento.horario.data,
-            "hora": agendamento.horario.hora
+            "data": agendamento.horario.data.strftime("%Y-%m-%d"),
+            "hora": agendamento.horario.hora.strftime("%H:%M")
         }
     }
 

@@ -1,60 +1,80 @@
-from flask import Blueprint, request, render_template, redirect, url_for
-from models import Horario
+from flask import Blueprint, request
 from extensions import db
 import datetime as dt
+
+from models import Horario
 from exceptions import DadosHorarioInvalidos, HorarioDuplicado, HorarioNaoEncontrado, DataInvalidaPassado, HoraInvalidaPassado, HorarioAgendado
 
 
 
-
-# ***MÉTODOS DE CONSULTA/PERSISTÊNCIA NO BANCO***
+# ***MÉTODOS DE CONSULTA/PERSISTÊNCIA NO BANCO DE DADOS***
 def salvar(horario):
+    """Salva no banco"""
     db.session.add(horario)
     db.session.commit()
     return horario
 
 
+def alterar(horario, data, hora):
+    """Altera no banco"""
+    horario.data = data
+    horario.hora = hora 
+    db.session.commit()
+    return horario
+
+
+def listar():
+    """Lista registros do banco"""
+    return Horario.query.all() # Pode ordenar por alguns campos depois
+
+
 def buscar_por_id(id):
+    """Busca pelo id no banco"""
     return Horario.query.get(id)
 
 
-def buscar_por_data_hora(data, hora):    
+def buscar_por_data_hora(data, hora):  
+    """Busca por data e hora no banco"""  
     return Horario.query.filter_by(data=data, hora=hora).first()
 
 
 def excluir(horario):    
+    """Exclui no banco"""
     db.session.delete(horario)
     db.session.commit()
-
-
-def alterar(horario, data, hora):
-    horario.data = data
-    horario.hora = hora 
-    db.session.commit()
-
-
-def listar():
-    return Horario.query.all() # Pode ordenar por alguns campos depois
-
 
 
 
 
 # ***MÉTODOS AUXILIARES***
 def formatar_data_hora(data, hora):
+    """Converte a data e hora do formato string para o formato de Date e Time"""
     try:
-        f_data = dt.datetime.strptime(data, "%Y-%m-%d").date()
+        f_data = dt.datetime.strptime(data, "%Y-%m-%d").date() 
         f_hora = dt.datetime.strptime(hora, "%H:%M").time()
         return f_data, f_hora
     
     except TypeError:
-        raise DadosHorarioInvalidos("As informações não podem ficar em branco!")
+        raise DadosHorarioInvalidos("Data ou hora faltando!")
     
     except ValueError:
-        raise DadosHorarioInvalidos("O formato da data deve ser DD/MM/AAAA e a hora HH:MM, além de serem datas e horas reais.") 
+        raise DadosHorarioInvalidos("O formato da data deve ser AAAA/MM/DD e a hora HH:MM, além de serem datas e horas reais.") 
+
+
+def validar_data_hora(data, hora):       
+    """Verifica se data/hora são válidas para um agendamento futuro"""    
+    #if data == None or hora == None:
+        #raise DadosHorarioInvalidos("Data ou hora faltando!") -- > PODE SER REMOVIDO POR CAUSA DE FORMATAR_DATA_HORA()
+            
+    if data < dt.date.today():
+        raise DataInvalidaPassado("A data está no passado!")
+
+    if data == dt.date.today() and hora < dt.datetime.now().time():
+        raise HoraInvalidaPassado("A hora está no passado!") 
 
 
 def buscar_horario(id):
+    """Busca um horário cadastrado no banco de dados"""
     horario_encontrado = buscar_por_id(id)
     if not horario_encontrado:
         raise HorarioNaoEncontrado("Horário não encontrado!")
@@ -62,35 +82,46 @@ def buscar_horario(id):
 
 
 def verificar_duplicidade(data, hora):
+    """Verifica se já existe no banco uma combinação de data + hora cadastrada"""
     if buscar_por_data_hora(data, hora):
         raise HorarioDuplicado("Horário já cadastrado no sistema!")
 
 
+def verificar_agendamento(horario):
+    """Verifica se um horário possui agendamento"""
+    if not horario.disponivel:
+        raise HorarioAgendado("Este horário está agendado!")
+
+
+def formatar_json(horario):
+    """Converte as informações de um horário para o formato json"""
+    return {              
+        "id": horario.id,
+        "data": horario.data.strftime("%Y-%m-%d"),
+        "hora": horario.hora.strftime("%H:%M"),
+        "disponivel": horario.disponivel        
+    }
 
 
 
 # ***SERVICES\CASOS DE USO***
 def cadastrar_horario(horario_novo):
+    """Cadastra um horário no banco validando data/hora e verificando se as informações não estão duplicadas""" 
     data_nova = horario_novo.data
     hora_nova = horario_novo.hora    
 
+    validar_data_hora(data_nova, hora_nova)
     verificar_duplicidade(data_nova, hora_nova)    
-    horario_criado = Horario(data_nova, hora_nova)
-    horario_criado.validar_horario()
 
+    horario_criado = Horario(data_nova, hora_nova)
     return salvar(horario_criado)
 
 
-def listar_horarios(): # Adicionar filtros no futuro
-    return listar()
-
-
-def alterar_horario(horario_atualizado, id):    
+def alterar_horario(horario_atualizado, id):   
+    """Altera um horário no banco validando data/hora e verificando se as informações não estão duplicadas""" 
     data_atualizada = horario_atualizado.data
     hora_atualizada = horario_atualizado.hora
-
-    aux = Horario(data_atualizada, hora_atualizada)
-    aux.validar_horario()
+    validar_data_hora(data_atualizada, hora_atualizada)
 
     horario_encontrado = buscar_horario(id)  
     data_encontrada = horario_encontrado.data
@@ -98,30 +129,25 @@ def alterar_horario(horario_atualizado, id):
 
     if not (data_atualizada == data_encontrada and hora_atualizada == hora_encontrada):
         verificar_duplicidade(data_atualizada, hora_atualizada)
-        alterar(horario_encontrado, data_atualizada, hora_atualizada)    
+        horario_encontrado = alterar(horario_encontrado, data_atualizada, hora_atualizada)    
 
     return horario_encontrado
-    
+
+
+def listar_horarios(): # Adicionar filtros no futuro
+    """Lista os horários do banco filtrando eles"""
+    return listar()   
 
 
 def excluir_horario(id):
+    """Exclui um horário do banco de dados se não estiver agendado"""
     horario_encontrado = buscar_horario(id) 
-    horario_encontrado.verificar_agendamento()
+    verificar_agendamento(horario_encontrado)
 
     excluir(horario_encontrado)
 
+   
 
-def agendar_horario(horario_id, agendamento_id):
-    # VERIFICAR SE NÃO TEM AGENDAMENTO_ID 
-    horario = buscar_horario(horario_id)
-    horario.verificar_agendamento()
-    horario.agendar_horario(agendamento_id)
-
-    return horario
-    
-    
-
-    
 
 # ***ROUTES***
 horarios_bp = Blueprint(
@@ -131,15 +157,21 @@ horarios_bp = Blueprint(
 )
 
 @horarios_bp.route("/", methods=["POST"])
-def route_cadastrar_horario():
-    data = request.form.get("data")
-    hora = request.form.get("hora")
+def route_cadastro():
+    dados = request.get_json(silent=True)
+    if not dados:
+        return {
+            "erro": "Os dados de horário devem ser enviados em JSON!"
+        }, 400
+
+    data = dados.get("data")
+    hora = dados.get("hora")
 
     try:
         data, hora = formatar_data_hora(data, hora)
 
         horario = Horario(data, hora)
-        cadastrar_horario(horario)
+        horario = cadastrar_horario(horario)
 
     except (
         DadosHorarioInvalidos,
@@ -147,70 +179,90 @@ def route_cadastrar_horario():
         HoraInvalidaPassado,
         HorarioDuplicado
     ) as erro:
-        return render_template(
-            "horarios/horarios.html",
-            horarios=listar_horarios(),
-            erro=str(erro)
-        ), 400
+        return {
+            "erro": str(erro)
+        }, 400
 
-    return redirect(url_for("horarios.route_listar_horarios"))    
+    return {
+        "mensagem": "Horário cadastrado com sucesso!",
+        "horario": formatar_json(horario)
+    }, 201
 
     
-
-
-@horarios_bp.route("/", methods=["GET"])
-def route_listar_horarios():
-    horarios = listar_horarios()
-    return render_template("horarios/horarios.html", horarios=horarios)
-
-
 @horarios_bp.route("/<int:id>", methods=["PUT"])
-def route_alterar_horario(id):     
-    data = request.form.get("data")
-    hora = request.form.get("hora")
+def route_alteracao(id):     
+    dados = request.get_json(silent=True)
+    if not dados:
+        return {
+            "erro": "Os dados de horário devem ser enviados em JSON!"
+        }, 400
+
+    data = dados.get("data")
+    hora = dados.get("hora")
 
     try:
         data, hora = formatar_data_hora(data, hora)
 
         horario = Horario(data, hora)
-
-        alterar_horario(horario, id)
+        horario = alterar_horario(horario, id)
 
     except (
         DadosHorarioInvalidos,
         DataInvalidaPassado,
         HoraInvalidaPassado,
-        HorarioDuplicado,
-        HorarioNaoEncontrado
+        HorarioDuplicado
     ) as erro:
+        return {
+            "erro": str(erro)
+        }, 400
 
-        return render_template(
-            "horarios/horarios.html",
-            horarios=listar_horarios(),
-            erro=str(erro)
-        ), 400
+    return {
+        "mensagem": "Horário alterado com sucesso!",
+        "horario": formatar_json(horario)
+    }, 200
 
-    return "", 200
+
+@horarios_bp.route("/", methods=["GET"])
+def route_listagem():
+    horarios = listar_horarios()  
+
+    horarios_json = [formatar_json(h) for h in horarios]    
+    return {
+        "horarios": horarios_json
+    }, 200
     
-   
-
-
 
 @horarios_bp.route("/<int:id>", methods=["DELETE"])
-def route_excluir_horario(id):
+def route_exclusao(id):
     try:
         excluir_horario(id)
 
-    except (HorarioNaoEncontrado, HorarioAgendado) as erro:
+    except (
+        HorarioNaoEncontrado, 
+        HorarioAgendado
+    ) as erro:
+        return {
+            "erro": str(erro)
+        }, 400
+    
+    return "", 204
 
-        return render_template(
-            "horarios/horarios.html",
-            horarios=listar_horarios(),
-            erro=str(erro)
-        ), 400
 
-    return "", 200
+@horarios_bp.route("/<int:id>", methods=["GET"])
+def route_busca(id):
+    try:
+        horario = buscar_horario(id)
+    except (
+        HorarioNaoEncontrado
+    ) as erro:
+        return {
+            "erro": str(erro)
+        }, 400
 
+    return {
+        "mensagem": "Horário encontrado com sucesso!",
+        "horario": formatar_json(horario)
+    }, 200
 
 
 
