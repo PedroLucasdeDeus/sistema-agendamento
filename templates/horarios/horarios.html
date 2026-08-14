@@ -11,13 +11,10 @@
     <main>
 
         <h1>GERENCIAMENTO DE HORÁRIOS</h1>
+    
         
-        {% if erro %}
-            <div id="mensagem-erro">
-                {{ erro }}
-            </div>
-        {% endif %}
-                
+        
+        
 
         <!-- =========================================================
              CADASTRO DE HORÁRIO
@@ -26,6 +23,12 @@
         <section>
 
             <h2>CADASTRAR HORÁRIO</h2>
+
+            {% if erro %}
+                <div id="mensagem-erro">
+                    {{ erro }}
+                </div>
+            {% endif %}
 
             <form method="POST" action="/horarios/">
 

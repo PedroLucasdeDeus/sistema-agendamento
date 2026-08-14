@@ -190,7 +190,6 @@ def route_alterar_horario(id):
             erro=str(erro)
         ), 400
 
-    #return redirect(url_for("horarios.route_listar_horarios")) ESTAVA DANDO ERRO NO SITE
     return "", 200
     
    
@@ -210,7 +209,6 @@ def route_excluir_horario(id):
             erro=str(erro)
         ), 400
 
-    #return redirect(url_for("horarios.route_listar_horarios")) ESTAVA DANDO ERRO NO SITE
     return "", 200
 
 
