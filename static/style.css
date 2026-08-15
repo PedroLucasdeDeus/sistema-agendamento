@@ -1102,3 +1102,99 @@ body {
     }
 
 }
+
+
+/* =========================================================
+   MODAIS
+   ========================================================= */
+
+dialog {
+    border:
+        1px solid #eee3df;
+
+    border-radius:
+        16px;
+
+    padding:
+        30px;
+
+    background:
+        #ffffff;
+
+    color:
+        #4a4140;
+
+    box-shadow:
+        0 10px 35px rgba(90, 70, 65, 0.15);
+
+    width:
+        90%;
+
+    max-width:
+        500px;
+
+    margin:
+        auto;
+}
+
+
+/*
+ * Fundo escurecido atrás do modal.
+ */
+
+dialog::backdrop {
+
+    background:
+        rgba(74, 65, 64, 0.35);
+}
+
+
+/* =========================================================
+   TÍTULO E SUBTÍTULO DOS MODAIS
+   ========================================================= */
+
+dialog h2 {
+
+    font-family:
+        Georgia,
+        serif;
+
+    font-size:
+        27px;
+
+    font-weight:
+        500;
+
+    color:
+        #765555;
+
+    margin-bottom:
+        8px;
+}
+
+
+dialog p {
+
+    color:
+        #9b8884;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.5;
+
+    margin-bottom:
+        22px;
+}
+
+
+/* =========================================================
+   BOTÕES DOS MODAIS
+   ========================================================= */
+
+dialog .button {
+
+    margin-right:
+        8px;
+}
