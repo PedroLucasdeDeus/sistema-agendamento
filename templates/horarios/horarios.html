@@ -1,0 +1,1248 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Horários
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+
+        <h1>
+            Horários
+        </h1>
+
+        <p>
+            Gerencie os horários disponíveis para agendamento na clínica.
+        </p>
+
+    </div>
+
+</section>
+
+
+<div id="mensagem"></div>
+
+
+<!-- =====================================================
+     CADASTRO DE HORÁRIO
+====================================================== -->
+
+<section class="card">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Cadastrar horário
+            </h1>
+
+            <p>
+                Informe a data e o horário que deseja cadastrar.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form id="form-cadastro">
+
+        <div class="form-group">
+
+            <label for="data-cadastro">
+                Data
+            </label>
+
+            <input
+                type="date"
+                id="data-cadastro"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="hora-cadastro">
+                Hora
+            </label>
+
+            <input
+                type="time"
+                id="hora-cadastro"
+                required
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="button">
+
+            Cadastrar horário
+
+        </button>
+
+    </form>
+
+</section>
+
+
+<br>
+
+
+<!-- =====================================================
+     FILTROS
+====================================================== -->
+
+<section class="card">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Pesquisar horários
+            </h1>
+
+            <p>
+                Utilize os filtros para encontrar horários específicos.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <form id="form-filtros">
+
+        <div class="form-group">
+
+            <label for="data-inicio">
+                Data inicial
+            </label>
+
+            <input
+                type="date"
+                id="data-inicio"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="data-fim">
+                Data final
+            </label>
+
+            <input
+                type="date"
+                id="data-fim"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="disponibilidade">
+                Disponibilidade
+            </label>
+
+            <select
+                id="disponibilidade"
+                style="
+                    width: 100%;
+                    padding: 12px 14px;
+                    border: 1px solid #ded2ce;
+                    border-radius: 9px;
+                    font-size: 14px;
+                    color: #4a4140;
+                    background: #fffdfc;
+                "
+            >
+
+                <option value="">
+                    Todas
+                </option>
+
+                <option value="true">
+                    Disponíveis
+                </option>
+
+                <option value="false">
+                    Indisponíveis
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="button">
+
+            Pesquisar
+
+        </button>
+
+
+        <button
+            type="button"
+            id="limpar-filtros"
+            class="button secondary">
+
+            Limpar filtros
+
+        </button>
+
+    </form>
+
+</section>
+
+
+<br>
+
+
+<!-- =====================================================
+     LISTAGEM
+====================================================== -->
+
+<section class="card">
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Horários cadastrados
+            </h1>
+
+            <p>
+                Consulte, altere ou exclua os horários cadastrados.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div id="carregando">
+
+        Carregando horários...
+
+    </div>
+
+
+    <div id="lista-horarios"></div>
+
+</section>
+
+
+<!-- =====================================================
+     MODAL DE ALTERAÇÃO
+====================================================== -->
+
+<dialog id="modal-alteracao">
+
+    <form id="form-alteracao">
+
+        <h2>
+            Alterar horário
+        </h2>
+
+
+        <p>
+            Atualize a data e a hora do horário selecionado.
+        </p>
+
+
+        <br>
+
+
+        <div class="form-group">
+
+            <label for="data-alteracao">
+                Data
+            </label>
+
+            <input
+                type="date"
+                id="data-alteracao"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="hora-alteracao">
+                Hora
+            </label>
+
+            <input
+                type="time"
+                id="hora-alteracao"
+                required
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="button">
+
+            Salvar
+
+        </button>
+
+
+        <button
+            type="button"
+            id="cancelar-alteracao"
+            class="button secondary">
+
+            Cancelar
+
+        </button>
+
+    </form>
+
+</dialog>
+
+
+<!-- =====================================================
+     MODAL DE EXCLUSÃO
+====================================================== -->
+
+<dialog id="modal-exclusao">
+
+    <div>
+
+        <h2>
+            Excluir horário
+        </h2>
+
+
+        <p>
+            Tem certeza que deseja excluir este horário?
+        </p>
+
+
+        <br>
+
+
+        <button
+            type="button"
+            id="confirmar-exclusao"
+            class="button danger">
+
+            Excluir
+
+        </button>
+
+
+        <button
+            type="button"
+            id="cancelar-exclusao"
+            class="button secondary">
+
+            Cancelar
+
+        </button>
+
+    </div>
+
+</dialog>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const mensagem =
+    document.getElementById(
+        "mensagem"
+    );
+
+
+const formCadastro =
+    document.getElementById(
+        "form-cadastro"
+    );
+
+
+const dataCadastro =
+    document.getElementById(
+        "data-cadastro"
+    );
+
+
+const horaCadastro =
+    document.getElementById(
+        "hora-cadastro"
+    );
+
+
+const formFiltros =
+    document.getElementById(
+        "form-filtros"
+    );
+
+
+const dataInicio =
+    document.getElementById(
+        "data-inicio"
+    );
+
+
+const dataFim =
+    document.getElementById(
+        "data-fim"
+    );
+
+
+const disponibilidade =
+    document.getElementById(
+        "disponibilidade"
+    );
+
+
+const limparFiltros =
+    document.getElementById(
+        "limpar-filtros"
+    );
+
+
+const listaHorarios =
+    document.getElementById(
+        "lista-horarios"
+    );
+
+
+const carregando =
+    document.getElementById(
+        "carregando"
+    );
+
+
+const modalAlteracao =
+    document.getElementById(
+        "modal-alteracao"
+    );
+
+
+const formAlteracao =
+    document.getElementById(
+        "form-alteracao"
+    );
+
+
+const dataAlteracao =
+    document.getElementById(
+        "data-alteracao"
+    );
+
+
+const horaAlteracao =
+    document.getElementById(
+        "hora-alteracao"
+    );
+
+
+const cancelarAlteracao =
+    document.getElementById(
+        "cancelar-alteracao"
+    );
+
+
+const modalExclusao =
+    document.getElementById(
+        "modal-exclusao"
+    );
+
+
+const confirmarExclusao =
+    document.getElementById(
+        "confirmar-exclusao"
+    );
+
+
+const cancelarExclusao =
+    document.getElementById(
+        "cancelar-exclusao"
+    );
+
+
+/*
+ * Guarda o ID do horário que está
+ * sendo alterado.
+ */
+
+let horarioAlteracaoId = null;
+
+
+/*
+ * Guarda o ID do horário que está
+ * sendo excluído.
+ */
+
+let horarioExclusaoId = null;
+
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+function mostrarMensagem(
+    texto,
+    tipo
+) {
+
+    mensagem.innerHTML = `
+
+        <div class="message ${tipo}">
+
+            ${texto}
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   FORMATAR DATA
+========================================================= */
+
+function formatarData(
+    data
+) {
+
+    if (!data) {
+        return "Não informado";
+    }
+
+
+    const partes =
+        data.split("-");
+
+
+    if (partes.length !== 3) {
+        return data;
+    }
+
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+}
+
+
+/* =========================================================
+   CARREGAR HORÁRIOS
+========================================================= */
+
+async function carregarHorarios() {
+
+    carregando.style.display =
+        "block";
+
+
+    listaHorarios.innerHTML =
+        "";
+
+
+    try {
+
+        const parametros =
+            new URLSearchParams();
+
+
+        /*
+         * Adiciona data inicial somente
+         * se ela tiver sido informada.
+         */
+
+        if (dataInicio.value) {
+
+            parametros.append(
+                "data_inicio",
+                dataInicio.value
+            );
+
+        }
+
+
+        /*
+         * Adiciona data final somente
+         * se ela tiver sido informada.
+         */
+
+        if (dataFim.value) {
+
+            parametros.append(
+                "data_fim",
+                dataFim.value
+            );
+
+        }
+
+
+        /*
+         * "Todas" possui valor vazio,
+         * portanto não deve ser enviada.
+         */
+
+        if (disponibilidade.value) {
+
+            parametros.append(
+                "disponivel",
+                disponibilidade.value
+            );
+
+        }
+
+
+        const url =
+            parametros.toString()
+                ? `/horarios/?${parametros.toString()}`
+                : "/horarios/";
+
+
+        const resposta =
+            await fetch(url);
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                dados.erro ||
+                "Não foi possível carregar os horários."
+            );
+
+        }
+
+
+        carregando.style.display =
+            "none";
+
+
+        mostrarHorarios(
+            dados.horarios || []
+        );
+
+
+    } catch (erro) {
+
+        carregando.style.display =
+            "none";
+
+
+        listaHorarios.innerHTML = `
+
+            <div class="message error">
+
+                ${
+                    erro.message ||
+                    "Não foi possível carregar os horários."
+                }
+
+            </div>
+
+        `;
+
+
+        console.error(erro);
+
+    }
+
+}
+
+
+/* =========================================================
+   MOSTRAR HORÁRIOS
+========================================================= */
+
+function mostrarHorarios(
+    horarios
+) {
+
+    if (
+        horarios.length === 0
+    ) {
+
+        listaHorarios.innerHTML = `
+
+            <div class="empty-state">
+
+                <h2>
+                    Nenhum horário encontrado
+                </h2>
+
+                <p>
+                    Não existem horários que correspondam
+                    aos filtros selecionados.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    listaHorarios.innerHTML =
+        horarios
+            .map(
+                horario => `
+
+                <div
+                    class="client-item"
+                >
+
+                    <div class="client-info">
+
+                        <h2>
+                            ${formatarData(horario.data)}
+                        </h2>
+
+
+                        <p>
+
+                            <strong>
+                                Hora:
+                            </strong>
+
+                            ${horario.hora}
+
+                        </p>
+
+
+                        <p>
+
+                            <strong>
+                                Disponibilidade:
+                            </strong>
+
+                            ${
+                                horario.disponivel
+                                    ? "Disponível"
+                                    : "Indisponível"
+                            }
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="client-actions">
+
+                        <button
+                            type="button"
+                            class="button secondary"
+                            title="Alterar"
+                            onclick="abrirModalAlteracao(
+                                ${horario.id},
+                                '${horario.data}',
+                                '${horario.hora}'
+                            )"
+                        >
+
+                            ✏️
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="button danger"
+                            title="Excluir"
+                            onclick="abrirModalExclusao(
+                                ${horario.id}
+                            )"
+                        >
+
+                            🗑️
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   CADASTRAR HORÁRIO
+========================================================= */
+
+formCadastro.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const data =
+            dataCadastro.value;
+
+
+        const hora =
+            horaCadastro.value;
+
+
+        /*
+         * Validação apenas para impedir
+         * o envio de campos vazios.
+         */
+
+        if (
+            !data ||
+            !hora
+        ) {
+
+            mostrarMensagem(
+                "Informe a data e a hora do horário.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "/horarios/",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                data: data,
+                                hora: hora
+                            })
+                    }
+                );
+
+
+            const dados =
+                await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                mostrarMensagem(
+                    dados.erro ||
+                    "Não foi possível cadastrar o horário.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            mostrarMensagem(
+                dados.mensagem ||
+                "Horário cadastrado com sucesso!",
+                "success"
+            );
+
+
+            /*
+             * Limpa o formulário.
+             */
+
+            dataCadastro.value = "";
+            horaCadastro.value = "";
+
+
+            /*
+             * Atualiza a lista.
+             */
+
+            await carregarHorarios();
+
+
+        } catch (erro) {
+            
+            alert(
+                "Erro ao conectar com o servidor."
+            );
+
+
+            console.error(erro);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FILTROS
+========================================================= */
+
+formFiltros.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+        carregarHorarios();
+
+    }
+);
+
+
+/* =========================================================
+   LIMPAR FILTROS
+========================================================= */
+
+limparFiltros.addEventListener(
+    "click",
+    function() {
+
+        dataInicio.value = "";
+        dataFim.value = "";
+        disponibilidade.value = "";
+
+
+        carregarHorarios();
+
+    }
+);
+
+
+/* =========================================================
+   ABRIR MODAL DE ALTERAÇÃO
+========================================================= */
+
+function abrirModalAlteracao(
+    id,
+    data,
+    hora
+) {
+
+    horarioAlteracaoId =
+        id;
+
+
+    dataAlteracao.value =
+        data;
+
+
+    horaAlteracao.value =
+        hora;
+
+
+    modalAlteracao.showModal();
+
+}
+
+
+/* =========================================================
+   CANCELAR ALTERAÇÃO
+========================================================= */
+
+cancelarAlteracao.addEventListener(
+    "click",
+    function() {
+
+        horarioAlteracaoId =
+            null;
+
+
+        modalAlteracao.close();
+
+    }
+);
+
+
+/* =========================================================
+   SALVAR ALTERAÇÃO
+========================================================= */
+
+formAlteracao.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const data =
+            dataAlteracao.value;
+
+
+        const hora =
+            horaAlteracao.value;
+
+
+        if (
+            !data ||
+            !hora
+        ) {
+
+            mostrarMensagem(
+                "Informe a data e a hora do horário.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    `/horarios/${horarioAlteracaoId}`,
+                    {
+                        method: "PUT",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                data: data,
+                                hora: hora
+                            })
+                    }
+                );
+
+
+            const dados =
+                await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                /*
+                 * O modal continua aberto
+                 * para que o usuário possa
+                 * corrigir os dados.
+                 */
+
+
+                /* O QUE ESTAVA ANTES
+                mostrarMensagem(
+                    dados.erro ||
+                    "Não foi possível alterar o horário.",
+                    "error"
+                );
+
+                return;
+                */
+
+
+                alert(
+                    dados.erro ||
+                    "Não foi possível alterar o horário."
+                );
+                return;
+
+
+            }
+
+
+            modalAlteracao.close();
+
+
+            horarioAlteracaoId =
+                null;
+
+
+            mostrarMensagem(
+                dados.mensagem ||
+                "Horário alterado com sucesso!",
+                "success"
+            );
+
+
+            await carregarHorarios();
+
+
+        } catch (erro) {
+            
+            alert(
+                "Erro ao conectar com o servidor."
+            );
+
+            console.error(erro);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   ABRIR MODAL DE EXCLUSÃO
+========================================================= */
+
+function abrirModalExclusao(
+    id
+) {
+
+    horarioExclusaoId =
+        id;
+
+
+    modalExclusao.showModal();
+
+}
+
+
+/* =========================================================
+   CANCELAR EXCLUSÃO
+========================================================= */
+
+cancelarExclusao.addEventListener(
+    "click",
+    function() {
+
+        horarioExclusaoId =
+            null;
+
+
+        modalExclusao.close();
+
+    }
+);
+
+
+/* =========================================================
+   CONFIRMAR EXCLUSÃO
+========================================================= */
+
+confirmarExclusao.addEventListener(
+    "click",
+    async function() {
+
+        if (
+            horarioExclusaoId === null
+        ) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    `/horarios/${horarioExclusaoId}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            /*
+             * O backend retorna 204
+             * quando a exclusão ocorre
+             * com sucesso.
+             */
+
+            if (
+                resposta.status === 204
+            ) {
+
+                modalExclusao.close();
+
+
+                horarioExclusaoId =
+                    null;
+
+
+                mostrarMensagem(
+                    "Horário excluído com sucesso!",
+                    "success"
+                );
+
+
+                await carregarHorarios();
+
+
+                return;
+
+            }
+
+
+            /*
+             * Se não for 204, esperamos
+             * uma resposta JSON contendo
+             * a mensagem de erro.
+             */
+
+            const dados =
+                await resposta.json();
+
+
+            mostrarMensagem(
+                dados.erro ||
+                "Não foi possível excluir o horário.",
+                "error"
+            );
+
+
+        } catch (erro) {
+            
+            alert(
+                "Erro ao conectar com o servidor."
+            );
+
+            console.error(erro);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+carregarHorarios();
+
+</script>
+
+{% endblock %}
