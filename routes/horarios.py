@@ -113,8 +113,9 @@ def verificar_duplicidade(data, hora):
 
 def verificar_agendamento(horario):
     """Verifica se um horário possui agendamento"""
-    if not horario.disponivel:
-        raise HorarioAgendado("Este horário está agendado!")
+    encontrado = horario.agendamentos
+    if len(encontrado) == 1:
+        raise HorarioAgendado("Este horário está agendado ou possui histório de agendamento!")
 
 
 def formatar_json(horario):
