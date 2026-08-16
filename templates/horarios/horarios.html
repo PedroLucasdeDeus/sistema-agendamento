@@ -1059,22 +1059,12 @@ formAlteracao.addEventListener(
                  * corrigir os dados.
                  */
 
-
-                /* O QUE ESTAVA ANTES
-                mostrarMensagem(
+                alert(
                     dados.erro ||
                     "Não foi possível alterar o horário.",
                     "error"
                 );
-
-                return;
-                */
-
-
-                alert(
-                    dados.erro ||
-                    "Não foi possível alterar o horário."
-                );
+                
                 return;
 
 
@@ -1216,7 +1206,7 @@ confirmarExclusao.addEventListener(
                 await resposta.json();
 
 
-            mostrarMensagem(
+            alert(
                 dados.erro ||
                 "Não foi possível excluir o horário.",
                 "error"
