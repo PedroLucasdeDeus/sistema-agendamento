@@ -83,3 +83,40 @@ class Agendamento(db.Model):
         "Horario",
         backref=db.backref("agendamentos", lazy=True)
     )
+
+
+class Horario(db.Model):
+    __tablename__ = "horarios"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    data = db.Column(
+        db.Date,
+        nullable=False
+    )
+
+    hora = db.Column(
+        db.Time,
+        nullable=False
+    )
+
+    disponivel = db.Column(
+        db.Boolean,
+        default=True,
+        nullable=False
+    )
+
+    def __init__(self, data, hora):     
+        self.data = data
+        self.hora = hora  
+        self.disponivel = True           
+
+
+ 
+    
+
+
+
