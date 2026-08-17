@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, render_template, request
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from extensions import db
@@ -10,6 +10,17 @@ agendamentos_bp = Blueprint(
     __name__,
     url_prefix="/agendamentos"
 )
+
+
+# ============================================================
+# PÁGINA HTML
+# ============================================================
+
+@agendamentos_bp.route("/pagina", methods=["GET"])
+def pagina_agendamentos():
+    return render_template(
+        "agendamentos/lista.html"
+    )
 
 
 def _serializar(agendamento):

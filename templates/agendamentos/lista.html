@@ -1,0 +1,760 @@
+{% extends "base.html" %}
+
+{% block title %}
+Agendamentos
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+
+    <div>
+
+        <h1>
+            Agendamentos
+        </h1>
+
+        <p>
+            Reservas de horários feitas pelos clientes.
+        </p>
+
+    </div>
+
+
+    <button
+        id="botao-novo"
+        class="button">
+
+        + Novo agendamento
+
+    </button>
+
+</section>
+
+
+<div id="mensagem"></div>
+
+
+<!-- =====================================================
+     FORMULÁRIO DE NOVO AGENDAMENTO
+====================================================== -->
+
+<section
+    id="form-novo"
+    class="card"
+    hidden>
+
+    <h2>
+        Novo agendamento
+    </h2>
+
+
+    <form id="form-agendamento">
+
+        <div class="form-group">
+
+            <label for="cliente">
+                Cliente
+            </label>
+
+            <select
+                id="cliente"
+                required>
+
+                <option
+                    value=""
+                    selected>
+
+                    Carregando clientes...
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="horario">
+                Horário
+            </label>
+
+            <select
+                id="horario"
+                required>
+
+                <option
+                    value=""
+                    selected>
+
+                    Carregando horários...
+
+                </option>
+
+            </select>
+
+            <p id="aviso-horarios">
+
+            </p>
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="button">
+
+            Salvar agendamento
+
+        </button>
+
+
+        <button
+            type="button"
+            id="botao-fechar-form"
+            class="button secondary">
+
+            Fechar
+
+        </button>
+
+    </form>
+
+</section>
+
+
+<!-- =====================================================
+     LISTA DE AGENDAMENTOS
+====================================================== -->
+
+<section class="card">
+
+    <div id="carregando">
+
+        Carregando agendamentos...
+
+    </div>
+
+
+    <div id="lista-agendamentos">
+
+    </div>
+
+</section>
+
+
+<script>
+
+/* =========================================================
+   ELEMENTOS
+========================================================= */
+
+const lista =
+    document.getElementById(
+        "lista-agendamentos"
+    );
+
+const carregando =
+    document.getElementById(
+        "carregando"
+    );
+
+const mensagem =
+    document.getElementById(
+        "mensagem"
+    );
+
+const formNovo =
+    document.getElementById(
+        "form-novo"
+    );
+
+const botaoNovo =
+    document.getElementById(
+        "botao-novo"
+    );
+
+const botaoFechar =
+    document.getElementById(
+        "botao-fechar-form"
+    );
+
+const formulario =
+    document.getElementById(
+        "form-agendamento"
+    );
+
+const selectCliente =
+    document.getElementById(
+        "cliente"
+    );
+
+const selectHorario =
+    document.getElementById(
+        "horario"
+    );
+
+const avisoHorarios =
+    document.getElementById(
+        "aviso-horarios"
+    );
+
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+function mostrarMensagem(
+    texto,
+    tipo
+) {
+
+    mensagem.className =
+        `message ${tipo}`;
+
+    mensagem.textContent =
+        texto;
+
+    mensagem.style.display =
+        "block";
+
+
+    setTimeout(
+        function() {
+
+            mensagem.style.display =
+                "none";
+
+        },
+        5000
+    );
+
+}
+
+
+/* =========================================================
+   FORMATAR DATA
+========================================================= */
+
+function formatarData(
+    dataISO
+) {
+
+    const [ano, mes, dia] =
+        dataISO.split("-");
+
+    return `${dia}/${mes}/${ano}`;
+
+}
+
+
+/* =========================================================
+   CARREGAR AGENDAMENTOS
+========================================================= */
+
+async function carregarAgendamentos() {
+
+    try {
+
+        const resposta =
+            await fetch(
+                "/agendamentos/"
+            );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro ao carregar agendamentos."
+            );
+
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        carregando.style.display =
+            "none";
+
+
+        mostrarAgendamentos(
+            dados.agendamentos || []
+        );
+
+
+    } catch (erro) {
+
+        carregando.style.display =
+            "none";
+
+
+        lista.innerHTML = `
+
+            <div class="message error">
+
+                Não foi possível carregar
+                os agendamentos.
+
+            </div>
+
+        `;
+
+
+        console.error(
+            erro
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MOSTRAR AGENDAMENTOS
+========================================================= */
+
+function mostrarAgendamentos(
+    agendamentos
+) {
+
+    if (
+        agendamentos.length === 0
+    ) {
+
+        lista.innerHTML = `
+
+            <div class="empty-state">
+
+                <h2>
+                    Nenhum agendamento ativo
+                </h2>
+
+                <p>
+                    Clique em "Novo agendamento"
+                    para reservar um horário.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    lista.innerHTML =
+        agendamentos
+            .map(
+                agendamento => `
+
+                <div class="client-item">
+
+                    <div class="client-info">
+
+                        <h2>
+                            ${
+                                agendamento.cliente.nome
+                            }
+                        </h2>
+
+
+                        <p>
+                            <strong>Data:</strong>
+                            ${
+                                formatarData(
+                                    agendamento.horario.data
+                                )
+                            }
+                        </p>
+
+
+                        <p>
+                            <strong>Horário:</strong>
+                            ${
+                                agendamento.horario.hora.slice(0, 5)
+                            }
+                        </p>
+
+                    </div>
+
+
+                    <div class="client-actions">
+
+                        <button
+                            class="button danger"
+                            onclick="cancelarAgendamento(${agendamento.id})">
+
+                            Cancelar
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `
+            )
+            .join("");
+
+}
+
+
+/* =========================================================
+   CANCELAR AGENDAMENTO
+========================================================= */
+
+async function cancelarAgendamento(
+    id
+) {
+
+    const confirmar =
+        confirm(
+            "Tem certeza que deseja cancelar este agendamento?"
+        );
+
+
+    if (!confirmar) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const resposta =
+            await fetch(
+                `/agendamentos/${id}/cancelar`,
+                {
+                    method: "PATCH"
+                }
+            );
+
+
+        if (!resposta.ok) {
+
+            const dados =
+                await resposta.json();
+
+            throw new Error(
+                dados.erro ||
+                "Erro ao cancelar."
+            );
+
+        }
+
+
+        mostrarMensagem(
+            "Agendamento cancelado com sucesso.",
+            "success"
+        );
+
+
+        carregarAgendamentos();
+
+
+    } catch (erro) {
+
+        mostrarMensagem(
+            erro.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR CLIENTES PARA O FORMULÁRIO
+========================================================= */
+
+async function carregarClientes() {
+
+    try {
+
+        const resposta =
+            await fetch(
+                "/clientes/"
+            );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro ao carregar clientes."
+            );
+
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        const clientes =
+            dados.clientes || [];
+
+
+        selectCliente.innerHTML = `
+
+            <option
+                value=""
+                selected>
+
+                Selecione um cliente
+
+            </option>
+
+            ${clientes.map(cliente => `
+
+                <option value="${cliente.id}">
+
+                    ${cliente.nome}
+
+                </option>
+
+            `).join("")}
+
+        `;
+
+
+    } catch (erro) {
+
+        selectCliente.innerHTML = `
+
+            <option value="">
+
+                Não foi possível carregar clientes.
+
+            </option>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   CARREGAR HORÁRIOS PARA O FORMULÁRIO
+========================================================= */
+
+async function carregarHorarios() {
+
+    try {
+
+        const resposta =
+            await fetch(
+                "/horarios/"
+            );
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Erro ao carregar horários."
+            );
+
+        }
+
+
+        const dados =
+            await resposta.json();
+
+
+        const horarios =
+            (dados.horarios || [])
+                .filter(
+                    horario =>
+                        horario.disponivel
+                );
+
+
+        if (horarios.length === 0) {
+
+            avisoHorarios.textContent =
+                "Nenhum horário disponível no momento.";
+
+        }
+
+
+        selectHorario.innerHTML = `
+
+            <option
+                value=""
+                selected>
+
+                Selecione um horário
+
+            </option>
+
+            ${horarios.map(horario => `
+
+                <option value="${horario.id}">
+
+                    ${
+                        formatarData(horario.data)
+                    } às ${
+                        horario.hora.slice(0, 5)
+                    }
+
+                </option>
+
+            `).join("")}
+
+        `;
+
+
+    } catch (erro) {
+
+        avisoHorarios.textContent =
+            "Módulo de horários ainda não integrado.";
+
+        selectHorario.innerHTML = `
+
+            <option value="">
+
+                Indisponível
+
+            </option>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   ABRIR / FECHAR FORMULÁRIO
+========================================================= */
+
+botaoNovo.addEventListener(
+    "click",
+    function() {
+
+        formNovo.hidden =
+            !formNovo.hidden;
+
+    }
+);
+
+
+botaoFechar.addEventListener(
+    "click",
+    function() {
+
+        formNovo.hidden =
+            true;
+
+    }
+);
+
+
+/* =========================================================
+   ENVIAR FORMULÁRIO
+========================================================= */
+
+formulario.addEventListener(
+    "submit",
+    async function(evento) {
+
+        evento.preventDefault();
+
+
+        const clienteId =
+            selectCliente.value;
+
+        const horarioId =
+            selectHorario.value;
+
+
+        if (!clienteId || !horarioId) {
+
+            mostrarMensagem(
+                "Selecione um cliente e um horário.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "/agendamentos/",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            cliente_id: Number(clienteId),
+                            horario_id: Number(horarioId)
+                        })
+                    }
+                );
+
+
+            const dados =
+                await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                throw new Error(
+                    dados.erro ||
+                    "Erro ao criar agendamento."
+                );
+
+            }
+
+
+            mostrarMensagem(
+                dados.mensagem,
+                "success"
+            );
+
+
+            formNovo.hidden =
+                true;
+
+            formulario.reset();
+
+            carregarAgendamentos();
+
+            carregarHorarios();
+
+
+        } catch (erro) {
+
+            mostrarMensagem(
+                erro.message,
+                "error"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+carregarAgendamentos();
+carregarClientes();
+carregarHorarios();
+
+</script>
+
+{% endblock %}

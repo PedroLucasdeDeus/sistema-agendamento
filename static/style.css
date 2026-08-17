@@ -437,6 +437,60 @@ body {
 }
 
 
+.form-group select {
+
+    width:
+        100%;
+
+    padding:
+        12px 14px;
+
+    border:
+        1px solid #ded2ce;
+
+    border-radius:
+        9px;
+
+    font-size:
+        14px;
+
+    color:
+        #4a4140;
+
+    background:
+        #fffdfc;
+
+    outline:
+        none;
+
+    transition:
+        0.2s;
+}
+
+
+.form-group select:focus {
+
+    border-color:
+        #b98989;
+
+    box-shadow:
+        0 0 0 3px rgba(185, 137, 137, 0.12);
+}
+
+
+.form-group p {
+
+    margin-top:
+        8px;
+
+    font-size:
+        13px;
+
+    color:
+        #a08078;
+}
+
+
 /* =========================================================
    MENSAGENS
    ========================================================= */

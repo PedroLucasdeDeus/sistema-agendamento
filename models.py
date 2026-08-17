@@ -109,14 +109,9 @@ class Horario(db.Model):
         nullable=False
     )
 
-    def __init__(self, data, hora):     
+    def __init__(self, data, hora):
         self.data = data
-        self.hora = hora  
-        self.disponivel = True           
-
-
- 
-    
-
+        self.hora = hora
+        self.disponivel = True
 
 
